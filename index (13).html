@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sethi Elec</title>
+  <meta name="description" content="Sethi Elec — Solutions électriques modernes, sûres et écologiques. Contactez-nous pour un devis.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <!-- AOS for scroll animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"/>
+  <link rel="icon" href="FAVICON.SETHIELEC.jpg" type="image/jpg">
+
+  <style>
+    :root{
+      --gold:#FFD24D; --blue:#0078c8; --bg:#F0FBF3; --panel:#ffffffcc;
+      --text:#0f1720; --glass-border: rgba(200,230,255,0.7);
+      --accent-grad: linear-gradient(135deg,var(--gold),var(--blue));
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Inter',system-ui,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+      line-height:1.45;
+    }
+
+    /* Loader */
+    #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:6000;transition:opacity .45s}
+    .spinner{width:56px;height:56px;border-radius:50%;border:8px solid rgba(223,246,221,1);border-top-color:var(--gold);animation:spin .95s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Header */
+    header{
+      position:fixed;top:0;left:0;width:100%;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+      backdrop-filter: blur(8px); background: rgba(255,255,255,0.72); border-bottom:2px solid var(--gold); z-index:1200;
+      box-shadow:0 6px 20px rgba(0,0,0,0.05);
+    }
+    .logo{display:flex;gap:12px;align-items:center;cursor:pointer}
+    .logo img{height:36px;width:auto}
+    .brand{font-weight:800;letter-spacing:.6px}
+    nav ul{display:flex;gap:14px;align-items:center;list-style:none}
+    nav a{color:var(--text);text-decoration:none;font-weight:700;font-size:0.95rem;position:relative;padding:6px 8px;border-radius:8px}
+    nav a:hover{background:rgba(0,0,0,0.03);color:var(--blue)}
+
+    /* mobile nav toggle */
+    .hambtn{display:none;background:transparent;border:0;font-weight:800;padding:8px;border-radius:8px}
+
+    /* Hero (slideshow) */
+    .hero{position:relative;padding-top:74px;min-height:88vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .hero-inner{width:100%;max-width:1200px;padding:22px;display:flex;gap:24px;align-items:center;z-index:4}
+
+    /* left: slides, right: content */
+    .left{flex:1;min-width:320px}
+    .right{width:360px;max-width:38%;min-width:260px;display:flex;flex-direction:column;gap:14px}
+
+    /* Glass card */
+    .glass{background:var(--panel);backdrop-filter:blur(10px);border-radius:16px;padding:18px;border:1px solid var(--glass-border);box-shadow:0 12px 40px rgba(2,6,23,0.06)}
+    .comic-title{font-weight:900;font-size:clamp(20px,4.4vw,34px);background:linear-gradient(90deg,var(--gold),var(--blue));-webkit-background-clip:text;color:transparent;text-transform:uppercase}
+
+    .subtitle{font-weight:700;color:var(--blue);margin-top:4px}
+    .cta-row{display:flex;gap:10px;align-items:center;margin-top:12px}
+    .btn{padding:12px 18px;border-radius:12px;border:0;background:var(--accent-grad);font-weight:800;cursor:pointer;color:#021}
+    .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text)}
+
+    /* Slides container */
+    .slideshow-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--glass-border);box-shadow:0 18px 42px rgba(2,6,23,0.06)}
+    .slideshow{width:100%;height:62vh;min-height:360px;background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(240,248,255,0.85));display:flex;align-items:center;justify-content:center;position:relative}
+    .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(1.04) translateY(8px);transition:opacity .8s, transform .8s}
+    .slide.active{opacity:1;transform:scale(1) translateY(0)}
+    .slide img, .slide video{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* Controls + dots */
+    .controls{position:absolute;top:12px;left:12px;display:flex;gap:8px;z-index:10}
+    .ctrl-btn{background:rgba(255,255,255,0.9);padding:8px 10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);font-weight:800;cursor:pointer}
+    .dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:8px;z-index:10}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,0.12);cursor:pointer}
+    .dot.active{background:var(--blue);box-shadow:0 4px 10px rgba(0,120,200,0.15)}
+
+    /* floating GUI pieces (translucent) */
+    .float-bg{position:absolute;inset:0;pointer-events:none;z-index:2}
+    .float-piece{position:absolute;border-radius:14px;backdrop-filter: blur(10px) saturate(120%);opacity:0.55;border:1px solid rgba(255,255,255,0.25);animation:floaty 9s ease-in-out infinite}
+    .float-piece.yellow{background:linear-gradient(135deg, rgba(255,210,77,0.9), rgba(255,240,210,0.6));left:6%;top:12%;width:260px;height:160px;transform:rotate(-6deg)}
+    .float-piece.blue{background:linear-gradient(135deg, rgba(0,120,200,0.9), rgba(160,225,255,0.12));right:6%;bottom:10%;width:340px;height:200px;transform:rotate(8deg)}
+    .float-piece.small{width:150px;height:100px;left:50%;top:6%;opacity:0.3;transform:translateX(-30%) rotate(-8deg)}
+    @keyframes floaty{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(1deg)}100%{transform:translateY(0) rotate(0deg)}}
+
+    /* small preview images floating in right column */
+    .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .preview img{width:100%;height:100px;object-fit:cover;border-radius:8px;box-shadow:0 8px 20px rgba(2,6,23,0.06)}
+
+    /* Sections */
+    .section{padding:72px 20px;max-width:1100px;margin:0 auto;position:relative}
+    h2{text-align:center;color:var(--blue);text-transform:uppercase;letter-spacing:2px;margin-bottom:18px}
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+    .info-box{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);transition:transform .28s}
+    .info-box:hover{transform:translateY(-6px) rotate(-1deg)}
+
+    /* Gallery grid */
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .gallery-item{position:relative;border-radius:10px;overflow:hidden}
+    .gallery-item img{width:100%;height:180px;object-fit:cover;display:block}
+
+    /* Contact modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:3500}
+    .modal-card{background:#fff;padding:22px;border-radius:12px;max-width:560px;width:94%;box-shadow:0 20px 50px rgba(0,0,0,0.35);position:relative}
+    .modal-close{position:absolute;top:12px;right:12px;cursor:pointer;font-size:18px}
+
+    /* Footer */
+    footer{background:var(--blue);color:#fff;padding:18px 10px;text-align:center;margin-top:40px}
+
+    /* custom cursor */
+    .cursor{width:12px;height:12px;border-radius:50%;position:fixed;pointer-events:none;transform:translate(-50%,-50%);background:var(--gold);box-shadow:0 0 10px var(--gold);z-index:5000;mix-blend-mode:screen}
+
+    /* responsive */
+    @media (max-width:1000px){ .right{display:none} .slideshow{height:56vh} }
+    @media (max-width:700px){
+      nav ul{display:none}
+      .hambtn{display:inline-block}
+      .slideshow{height:48vh}
+      .hero-inner{flex-direction:column;align-items:stretch}
+      header{padding:10px}
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- loader -->
+  <div id="loader"><div class="spinner" role="status" aria-label="Chargement"></div></div>
+
+  <!-- custom cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <!-- header -->
+  <header>
+    <div class="logo" onclick="openSite()">
+      <img src="FAVICON.SETHIELEC.jpg" alt="Sethi Elec logo">
+      <div>
+        <div class="brand">SETHI ELEC</div>
+        <div style="font-size:12px;color:rgba(0,0,0,0.5)">Énergie & Innovation</div>
+      </div>
+    </div>
+
+    <nav>
+      <ul>
+        <li><a href="#about">À propos</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Galerie</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="hambtn" aria-label="Menu" onclick="toggleMobileMenu()">☰</button>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <main class="hero" role="main" aria-label="Présentation">
+    <div class="hero-inner">
+
+      <!-- left: slides -->
+      <div class="left">
+        <div class="slideshow-wrap glass" aria-roledescription="carousel" aria-label="Diaporama images et vidéos">
+          <div class="float-bg" aria-hidden="true">
+            <div class="float-piece yellow"></div>
+            <div class="float-piece blue"></div>
+            <div class="float-piece small"></div>
+          </div>
+
+          <!-- IMAGE SLIDESHOW -->
+          <section id="mainImageCarousel" class="slideshow" aria-label="Diaporama d'images">/
+            <div class="controls" aria-hidden="true">
+              <button class="ctrl-btn" id="imgPrev" aria-label="Image précédente">◀</button>
+              <button class="ctrl-btn" id="imgNext" aria-label="Image suivante">▶</button>
+            </div>
+
+            <div class="slide active" role="group" aria-roledescription="slide" aria-label="Image 1">
+              <img src="lampovyj-wAvvXOmYlv4.jpg" alt="Projet vue 1">
+            </div>
+            <div class="slide" role="group" aria-roledescription="slide" aria-label="Image 2">
+              <img src="isaactmitchell--2hQyCjuxDs.jpg" alt="Projet vue 2">
+            </div>
+            <div class="slide" role="group" aria-roledescription="slide" aria-label="Image 3">
+              <img src="kazmirova-fGiaCzQiWCE.jpg" alt="Projet vue 3">
+            </div>
+            <div class="slide" role="group" aria-roledescription="slide" aria-label="Image 4">
+              <img src="shootnmatch-m5xota77OxM.jpg" alt="Projet vue 4">
+            </div>
+
+            <div class="dots" id="imageDots" aria-hidden="true"></div>
+          </section>
+
+          <!-- VIDEO SLIDESHOW (smaller toggled area under image slideshow on large screens) -->
+          <section id="mainVideoCarousel" class="slideshow" aria-label="Diaporama vidéo" style="height:240px;margin-top:12px;border-radius:10px;overflow:hidden">
+            <div class="controls" aria-hidden="true">
+              <button class="ctrl-btn" id="vidPrev" aria-label="Vidéo précédente">◀</button>
+              <button class="ctrl-btn" id="vidNext" aria-label="Vidéo suivante">▶</button>
+            </div>
+
+            <div class="slide active" role="group" aria-roledescription="slide" aria-label="Vidéo 1">
+              <video src="Untitled design.mp4" muted loop playsinline preload="metadata"></video>
+            </div>
+            <div class="slide" role="group" aria-roledescription="slide" aria-label="Vidéo 2">
+              <video src="Untitled design.mp4" muted loop playsinline preload="metadata"></video>
+            </div>
+            <div class="dots" id="videoDots" aria-hidden="true"></div>
+          </section>
+        </div>
+      </div>
+
+      <!-- right: content -->
+      <aside class="right">
+        <div class="glass">
+          <h1 class="comic-title">Sethi Elec</h1>
+          <div class="subtitle">⚡ Énergie & Innovation depuis 2024</div>
+          <p style="margin-top:10px;color:rgba(0,0,0,0.7)">Solutions électriques résidentielles & commerciales — installations, maintenance et systèmes intelligents.</p>
+          <div class="cta-row">
+            <button class="btn" id="requestQuote">Demander un devis</button>
+            <button class="btn ghost" id="viewProjects">Nos projets</button>
+          </div>
+
+          <div style="margin-top:14px">
+            <div style="font-weight:800;margin-bottom:6px">Aperçu rapide</div>
+            <div class="preview-grid">
+              <div class="preview"><img src="lampovyj-wAvvXOmYlv4 (1).jpg" alt="Aperçu 1"></div>
+              <div class="preview"><img src="image-cgen.jpeg" alt="Aperçu 2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-top:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><strong>Contact rapide</strong><div style="font-size:12px;color:rgba(0,0,0,0.6)">Disponible 24/7</div></div>
+            <div style="text-align:right">
+              <div style="font-weight:800;color:var(--blue)">+33 6 99 99 99 70</div>
+              <div style="font-size:12px;color:rgba(0,0,0,0.6)">IObis rue Kléber, Montreuil</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="btn" id="callBtn">Appeler</button>
+            <button class="btn ghost" id="emailBtn">Envoyer Email</button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- About -->
+  <section id="about" class="section" data-aos="fade-up">
+    <div class="glass">
+      <h2>À propos de nous</h2>
+      <p><strong>Sethi Elec</strong> est fondée en 2024 par <strong>Amir Shehzad</strong>. Nous fournissons des solutions électriques sûres, modernes et respectueuses de l'environnement.</p>
+      <div class="info-grid" style="margin-top:16px">
+        <div class="info-box"><strong>Excellence</strong><p>Respect des normes les plus strictes.</p></div>
+        <div class="info-box"><strong>Confiance</strong><p>Partenariats durables avec entreprises et particuliers.</p></div>
+        <div class="info-box"><strong>Innovation</strong><p>Intégration de domotique et optimisation énergétique.</p></div>
+        <div class="info-box"><strong>Sécurité</strong><p>Procédures et contrôles rigoureux sur chaque projet.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="section" data-aos="fade-up">
+    <div class="glass">
+      <h2>Nos Services</h2>
+      <div class="info-grid" style="margin-top:16px">
+        <div class="info-box"><strong>Résidentiel</strong><p>Installations et rénovations électriques.</p></div>
+        <div class="info-box"><strong>Commercial</strong><p>Systèmes pour commerces et centres commerciaux.</p></div>
+        <div class="info-box"><strong>Maintenance</strong><p>Contrats d'entretien et interventions d'urgence.</p></div>
+        <div class="info-box"><strong>Domotique</strong><p>Automatisation et optimisation énergétique.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery" class="section" data-aos="fade-up">
+    <h2>Galerie</h2>
+    <div class="gallery-grid" style="margin-top:18px">
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.13.jpeg" alt="Projet 1"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14 (3).jpeg" alt="Projet 2"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14.jpeg" alt="Projet 3"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14 (5).jpeg" alt="Projet 4"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14 (4).jpeg" alt="Projet 4"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14 (1).jpeg" alt="Projet 4"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.14 (2).jpeg" alt="Projet 4"></div>
+      <div class="gallery-item"><img src="WhatsApp Image 2025-09-29 at 23.13.15.jpeg" alt="Projet 4"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section" data-aos="fade-up">
+    <div class="glass">
+      <h2>Contactez-nous</h2>
+      <p><strong>Adresse:</strong> IObis rue Kléber, 93100 Montreuil</p>
+      <p><strong>Téléphone:</strong> +33 6 99 99 99 70</p>
+      <p><strong>Email:</strong> sethielecamir@gmail.com</p>
+      <div style="margin-top:12px">
+        <button class="btn" id="openContact">Envoyer un Email</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact modal -->
+  <div class="modal" id="contactModal" aria-hidden="true" role="dialog" aria-labelledby="contactTitle">
+    <div class="modal-card" role="document">
+      <button class="modal-close" id="modalClose" aria-label="Fermer">×</button>
+      <h3 id="contactTitle">Envoyer un Email</h3>
+      <form id="contactForm">
+        <input name="name" type="text" placeholder="Nom" required style="width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid #ddd">
+        <input name="email" type="email" placeholder="Email" required style="width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid #ddd">
+        <input name="phone" type="text" placeholder="Téléphone" style="width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid #ddd">
+        <textarea name="message" rows="4" placeholder="Votre message" required style="width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid #ddd"></textarea>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn" type="submit" style="flex:1">Envoyer (direct)</button>
+          <button id="mailtoFallback" type="button" style="flex:1;background:#444;border-radius:12px;color:#fff;border:none;cursor:pointer">Ouvrir Email</button>
+        </div>
+        <p id="formStatus" style="margin-top:8px;font-size:.95rem;color:#333;display:none"></p>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>© <span id="year"></span> Sethi Elec — Tous droits réservés | Développé par INOXZENT.in</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    // Basic initializations
+    document.getElementById('year').textContent = new Date().getFullYear();
+    lucide.createIcons && lucide.createIcons();
+    AOS.init({duration:900, once:true});
+
+    // Loader
+    window.addEventListener('load', ()=> {
+      const loader = document.getElementById('loader');
+      loader.style.opacity = '0';
+      setTimeout(()=> loader.style.display='none', 500);
+    });
+
+    // Mobile menu (simple toggle)
+    function toggleMobileMenu(){
+      alert("Menu mobile: utilisez les ancres dans l'entête ou scrollez la page.");
+    }
+
+    // Open Google Sites link
+    function openSite(){ window.open('https://sites.google.com/view/sethielec/home','_blank') }
+
+    // CONTACT modal behaviours
+    const openContactBtn = document.getElementById('openContact');
+    const contactModal = document.getElementById('contactModal');
+    const modalClose = document.getElementById('modalClose');
+    openContactBtn.addEventListener('click', ()=> { contactModal.style.display='flex'; contactModal.setAttribute('aria-hidden','false'); document.querySelector('#contactModal input[name="name"]').focus(); });
+    modalClose.addEventListener('click', ()=> { contactModal.style.display='none'; contactModal.setAttribute('aria-hidden','true'); });
+    window.addEventListener('keydown', (e)=> { if(e.key==='Escape') { contactModal.style.display='none'; contactModal.setAttribute('aria-hidden','true'); }});
+    contactModal.addEventListener('click', (e)=> { if(e.target === contactModal) { contactModal.style.display='none'; contactModal.setAttribute('aria-hidden','true'); }});
+
+    // EmailJS placeholders (configure with your keys)
+    const EMAILJS_PUBLIC_KEY='YOUR_EMAILJS_PUBLIC_KEY';
+    const EMAILJS_SERVICE_ID='YOUR_SERVICE_ID';
+    const EMAILJS_TEMPLATE_ID='YOUR_TEMPLATE_ID';
+    try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e){ /* ignore if not set */ }
+
+    // Contact form submission
+    const contactForm = document.getElementById('contactForm');
+    const formStatus = document.getElementById('formStatus');
+    const mailtoBtn = document.getElementById('mailtoFallback');
+    contactForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      formStatus.style.display='none';
+      const data = {
+        name: contactForm.name.value.trim(),
+        email: contactForm.email.value.trim(),
+        phone: contactForm.phone.value.trim(),
+        message: contactForm.message.value.trim()
+      };
+      const mailtoLink = `mailto:sethielecamir@gmail.com?subject=Contact%20from%20${encodeURIComponent(data.name)}&body=${encodeURIComponent(JSON.stringify(data,null,2))}`;
+      mailtoBtn.onclick = () => window.open(mailtoLink,'_blank');
+
+      if(EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY'){
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, data)
+        .then(()=>{ formStatus.style.display='block'; formStatus.textContent='Message envoyé avec succès!'; contactForm.reset(); })
+        .catch(()=>{ formStatus.style.display='block'; formStatus.textContent='Erreur lors de l\'envoi, utilisez "Ouvrir Email"'; });
+      } else {
+        formStatus.style.display='block';
+        formStatus.textContent='Service Email non configuré, utilisez "Ouvrir Email"';
+      }
+    });
+
+    // Image & Video carousels logic (reusable)
+    function Carousel(rootId, opts = {}) {
+      this.root = document.getElementById(rootId);
+      this.slides = Array.from(this.root.querySelectorAll('.slide'));
+      this.dotsContainer = document.getElementById(rootId === 'mainImageCarousel' ? 'imageDots' : 'videoDots');
+      this.prevBtn = this.root.querySelector('.ctrl-btn:first-child');
+      this.nextBtn = this.root.querySelector('.ctrl-btn:last-child');
+      this.index = 0;
+      this.interval = opts.interval || 4500;
+      this.timer = null;
+      this.autoplay = true;
+      this.init();
+    }
+    Carousel.prototype.init = function(){
+      // create dots
+      this.dotsContainer.innerHTML = '';
+      this.slides.forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        d.dataset.index = i;
+        d.addEventListener('click', ()=> { this.show(i); this.reset(); });
+        this.dotsContainer.appendChild(d);
+      });
+      // prev/next
+      this.prevBtn && this.prevBtn.addEventListener('click', ()=> { this.prev(); this.reset(); });
+      this.nextBtn && this.nextBtn.addEventListener('click', ()=> { this.next(); this.reset(); });
+
+      // mouse pause
+      this.root.addEventListener('mouseenter', ()=> { this.autoplay = false; this.stop(); });
+      this.root.addEventListener('mouseleave', ()=> { this.autoplay = true; this.start(); });
+
+      // keyboard nav
+      window.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight') { this.next(); this.reset(); }
+        if(e.key === 'ArrowLeft') { this.prev(); this.reset(); }
+      });
+
+      // initial show
+      this.show(0);
+      this.start();
+    }
+    Carousel.prototype.show = function(i){
+      this.slides.forEach((s, idx) => s.classList.toggle('active', idx===i));
+      Array.from(this.dotsContainer.children).forEach((d, idx) => d.classList.toggle('active', idx===i));
+      // ensure videos play/pause when active
+      this.slides.forEach((s, idx) => {
+        const vid = s.querySelector('video');
+        if(vid) {
+          if(idx === i) { vid.play().catch(()=>{}); }
+          else { vid.pause(); vid.currentTime = 0; }
+        }
+      });
+      this.index = i;
+    }
+    Carousel.prototype.next = function(){ this.show((this.index+1) % this.slides.length); }
+    Carousel.prototype.prev = function(){ this.show((this.index-1 + this.slides.length) % this.slides.length); }
+    Carousel.prototype.start = function(){ if(this.timer) clearInterval(this.timer); if(this.autoplay) this.timer = setInterval(()=> this.next(), this.interval); }
+    Carousel.prototype.stop = function(){ if(this.timer) clearInterval(this.timer); this.timer = null; }
+    Carousel.prototype.reset = function(){ this.stop(); if(this.autoplay) this.start(); }
+
+    // instantiate carousels
+    const imageCarousel = new Carousel('mainImageCarousel', { interval: 4800 });
+    const videoCarousel = new Carousel('mainVideoCarousel', { interval: 6000 });
+
+    // simple CTA buttons
+    document.getElementById('requestQuote').addEventListener('click', ()=> { document.getElementById('contactModal').style.display = 'flex'; document.getElementById('contactModal').setAttribute('aria-hidden','false'); });
+    document.getElementById('emailBtn').addEventListener('click', ()=> window.open('mailto:sethielecamir@gmail.com','_blank'));
+    document.getElementById('callBtn').addEventListener('click', ()=> window.open('tel:+33699999970'));
+
+    // small helpers: scroll to projects
+    document.getElementById('viewProjects').addEventListener('click', ()=> { window.location.hash = '#gallery'; });
+
+    // custom cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+
+    // Floating particle background (canvas)
+    (function(){
+      const canvas = document.createElement('canvas');
+      canvas.style.position = 'fixed'; canvas.style.inset = 0; canvas.style.zIndex = -1; canvas.setAttribute('aria-hidden','true');
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      let w, h, parts = [];
+      function resize(){ w = canvas.width = innerWidth; h = canvas.height = innerHeight; parts = []; for(let i=0;i<80;i++){ parts.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+1,dx:(Math.random()-0.5)*0.6,dy:(Math.random()-0.5)*0.6, c: Math.random()>.5 ? 'rgba(0,120,200,0.65)' : 'rgba(255,210,77,0.55)'}); } }
+      window.addEventListener('resize', resize);
+      resize();
+      let t = 0;
+      function loop(){
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ requestAnimationFrame(loop); return; }
+        ctx.clearRect(0,0,w,h);
+        for(const p of parts){
+          ctx.beginPath();
+          ctx.fillStyle = p.c;
+          ctx.globalAlpha = 0.9;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+          p.x += Math.sin((t+p.x)*0.002)*0.3 + p.dx;
+          p.y += Math.cos((t+p.y)*0.002)*0.3 + p.dy;
+          if(p.x < -20) p.x = w+20;
+          if(p.x > w+20) p.x = -20;
+          if(p.y < -20) p.y = h+20;
+          if(p.y > h+20) p.y = -20;
+        }
+        t++;
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+
+    // Accessibility: honor reduced motion by disabling transitions & autoplay
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      document.querySelectorAll('.slide').forEach(s => s.style.transition = 'none');
+      imageCarousel && (imageCarousel.autoplay = false);
+      videoCarousel && (videoCarousel.autoplay = false);
+    }
+
+    // Light-touch performance tips in console
+    console.info('Sethi Elec site loaded — replace picsum images and sample videos with your own assets (optimize via WebP).');
+  </script>
+</body>
+</html>
